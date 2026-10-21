@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>سامانه بیمه مستر - پاداش‌ها</title>
+  <style>
+    /* فونت‌های سیستمی تمیز و استاندارد فارسی */
+    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
+
+    :root {
+      --header-bg: #032b49;
+      --page-bg: #eef2f6;
+      --card-bg: #ffffff;
+      --tax-bg: #dbe7fb;
+      --tax-text: #3c7bf6;
+      --badge-blue: #3795fc;
+      --text-dark: #1f2a37;
+      --text-muted: #8a94a6;
+      --border-light: #f1f3f7;
+      --arrow-color: #9aa5b5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Tahoma, sans-serif;
+    }
+
+    body {
+      background-color: var(--page-bg);
+      color: var(--text-dark);
+      direction: rtl;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* شبیه‌ساز ابعاد موبایل */
+    .mobile-container {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background-color: #f7f9fc;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 0 20px rgba(0,0,0,0.06);
+    }
+
+    /* سربرگ سرمه‌ای با لوگوی شفاف و منو */
+    .top-header {
+      background-color: var(--header-bg);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-menu-btn {
+      background: none;
+      border: none;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+      padding: 6px;
+    }
+
+    .header-menu-btn span {
+      display: block;
+      width: 22px;
+      height: 2.5px;
+      background-color: #ffffff;
+      border-radius: 2px;
+    }
+
+    .header-logo-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .header-logo-container img {
+      height: 30px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    /* محتوای اصلی صفحه */
+    .main-content {
+      padding: 14px 14px 40px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* کادر لینک احکام مالیاتی کل کشور */
+    .tax-alert-box {
+      background-color: var(--tax-bg);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--tax-text);
+      font-size: 14px;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+
+    .tax-alert-box:active {
+      opacity: 0.8;
+    }
+
+    .tax-alert-box svg {
+      width: 17px;
+      height: 17px;
+      stroke: var(--tax-text);
+      stroke-width: 2.2;
+      fill: none;
+      transform: rotate(-45deg);
+    }
+
+    /* کارت سفید پاداش‌ها */
+    .rewards-card {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      padding: 20px 16px 10px 16px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+
+    /* هدر کارت پاداش */
+    .card-header-area {
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #1a222f;
+      margin-bottom: 6px;
+    }
+
+    .total-commission-row {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-size: 13.5px;
+      color: var(--text-muted);
+    }
+
+    .total-amount-val {
+      font-size: 16px;
+      font-weight: 800;
+      color: #2b3648;
+      letter-spacing: 0.5px;
+    }
+
+    .currency-label {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* جدول سرفصل دوره‌ها */
+    .table-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text-muted);
+      font-size: 13.5px;
+      font-weight: 500;
+      padding-left: 28px;
+    }
+
+    /* ردیف‌های لیست پاداش */
+    .reward-item {
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .reward-item:last-child {
+      border-bottom: none;
+    }
+
+    .reward-row-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px 0;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .right-side-date {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .arrow-icon {
+      color: var(--arrow-color);
+      display: flex;
+      align-items: center;
+      transition: transform 0.25s ease;
+    }
+
+    .arrow-icon svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--arrow-color);
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    .reward-item.expanded .arrow-icon {
+      transform: rotate(90deg);
+    }
+
+    .date-label {
+      font-size: 13.5px;
+      color: #4b5565;
+      font-weight: 500;
+    }
+
+    /* کپسول آبی مبلغ */
+    .amount-badge {
+      background-color: var(--badge-blue);
+      color: #ffffff;
+      padding: 6.5px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .badge-curr {
+      font-size: 11px;
+      font-weight: 400;
+      opacity: 0.9;
+    }
+
+    /* بخش جزئیات بازشونده آکاردئونی */
+    .reward-detail-panel {
+      display: none;
+      background-color: #f9fbfe;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      font-size: 12.5px;
+      color: #526071;
+      line-height: 1.8;
+      border: 1px dashed #d5e2f5;
+    }
+
+    .reward-item.expanded .reward-detail-panel {
+      display: block;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* دکمه شناور تنظیمات و پنل مدیریت */
+    .floating-gear-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--header-bg);
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 999;
+    }
+
+    .floating-gear-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: #ffffff;
+    }
+
+    /* پنل مدیریت مدال (Modal) */
+    .admin-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(10, 20, 35, 0.6);
+      backdrop-filter: blur(3px);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    .admin-modal-overlay.open {
+      display: flex;
+    }
+
+    .admin-drawer {
+      background: #ffffff;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      overflow-y: auto;
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .drawer-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .close-btn {
+      background: #f3f4f6;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 13.5px;
+    }
+
+    .admin-btn {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-secondary { background: #e5e7eb; color: #374151; }
+    .btn-danger { background: #fee2e2; color: #dc2626; }
+    .btn-save { background: #10b981; color: #fff; width: 100%; padding: 12px; font-size: 14px; }
+
+    .items-table-scroll {
+      max-height: 220px;
+      overflow-y: auto;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 8px;
+    }
+
+    .admin-row-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 4px;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mobile-container">
+    
+    <!-- ۱. هدر سرمه‌ای مشابه تصویر اصلی با لوگو و منو -->
+    <header class="top-header">
+      <!-- سمت چپ: دکمه منو سه خط (باز کردن پنل مدیریت) -->
+      <button class="header-menu-btn" onclick="toggleAdmin(true)" aria-label="منو">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- سمت راست: فایل شفاف لوگوی بیمه مستر -->
+      <div class="header-logo-container">
+        <!-- لوگوی دقیق درج شده به صورت وکتور استاندارد بر اساس فایل ارسالی -->
+        <svg style="height: 30px; fill: #ffffff;" viewBox="0 0 460 120" xmlns="http://www.w3.org/2000/svg">
+          <path d="M433.8 33.3C425.2 24.7 413.5 20 401.3 20c-12.2 0-23.9 4.7-32.5 13.3l-5.6 5.6-5.6-5.6c-8.6-8.6-20.3-13.3-32.5-13.3s-23.9 4.7-32.5 13.3c-17.9 17.9-17.9 47.1 0 65l60.3 60.3c2.9 2.9 6.8 4.4 10.7 4.4s7.8-1.5 10.7-4.4l60.3-60.3c17.9-17.9 17.9-47.1-.6-65zm-14.7 50.8L367 136.2 315 84.1c-10.1-10.1-10.1-26.6 0-36.8 4.9-4.9 11.5-7.6 18.4-7.6s13.5 2.7 18.4 7.6l15.2 15.2 15.2-15.2c4.9-4.9 11.5-7.6 18.4-7.6s13.5 2.7 18.4 7.6c10.1 10.2 10.1 26.7.1 36.8z"/>
+          <path d="M266.3 80.2c-5.8 0-10.5-4.7-10.5-10.5V47.9c0-5.8-4.7-10.5-10.5-10.5s-10.5 4.7-10.5 10.5v21.8c0 17.4 14.1 31.5 31.5 31.5h16.2c5.8 0 10.5-4.7 10.5-10.5s-4.7-10.5-10.5-10.5h-16.2zM195.1 37.4c-5.8 0-10.5 4.7-10.5 10.5v41.3c0 5.8 4.7 10.5 10.5 10.5s10.5-4.7 10.5-10.5V47.9c0-5.8-4.7-10.5-10.5-10.5zM148.2 37.4c-5.8 0-10.5 4.7-10.5 10.5v41.3c0 5.8 4.7 10.5 10.5 10.5s10.5-4.7 10.5-10.5V47.9c0-5.8-4.7-10.5-10.5-10.5zM101.4 37.4c-5.8 0-10.5 4.7-10.5 10.5v41.3c0 5.8 4.7 10.5 10.5 10.5s10.5-4.7 10.5-10.5V47.9c0-5.8-4.7-10.5-10.5-10.5z"/>
+          <circle cx="50" cy="50" r="11"/>
+          <path d="M50 72c-15 0-28 12-28 27h56c0-15-13-27-28-27z"/>
+        </svg>
+      </div>
+    </header>
+
+    <!-- محتوای صفحه -->
+    <main class="main-content">
+
+      <!-- ۲. کادر آبی روشن لینک احکام مالیاتی کل کشور با لینک ارسالی -->
+      <a href="https://inta.tax.gov.ir/Pages/Action/LawsDocShow/5/1/1/1000/6263" target="_blank" rel="noopener noreferrer" class="tax-alert-box">
+        <span>لینک احکام مالیاتی کل کشور</span>
+        <svg viewBox="0 0 24 24">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+        </svg>
+      </a>
+
+      <!-- ۳. کارت سفید پاداش‌ها -->
+      <section class="rewards-card">
+        
+        <!-- عنوان و جمع کل -->
+        <div class="card-header-area">
+          <h1 class="card-title">پاداش ها</h1>
+          <div class="total-commission-row">
+            <span>جمع کل پورسانت ها</span>
+            <span class="total-amount-val" id="totalAmountDisplay">15,220,689,008</span>
+            <span class="currency-label">ریال</span>
+          </div>
+        </div>
+
+        <!-- عناوین جدول (دوره در راست / جمع پاداش در چپ) -->
+        <div class="table-head">
+          <span>دوره</span>
+          <span>جمع پاداش</span>
+        </div>
+
+        <!-- لیست ردیف‌های پاداش دوره‌ای -->
+        <div id="rewardsListContainer">
+          <!-- ردیف‌ها با JS ساخته می‌شوند -->
+        </div>
+
+      </section>
+    </main>
+
+    <!-- دکمه شناور تنظیمات برای دسترسی آسان به پنل مدیریت دستی -->
+    <button class="floating-gear-btn" onclick="toggleAdmin(true)" title="مدیریت پاداش‌ها">
+      <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+    </button>
+
+    <!-- ۴. پنل مدیریت دستی (کشو از پایین) -->
+    <div class="admin-modal-overlay" id="adminModal" onclick="handleOverlayClick(event)">
+      <div class="admin-drawer">
+        <div class="drawer-header">
+          <span class="drawer-title">مدیریت اطلاعات و مقادیر پاداش‌ها</span>
+          <button class="close-btn" onclick="toggleAdmin(false)">✕</button>
+        </div>
+
+        <!-- فیلد مستقل مجموع کل -->
+        <div class="form-group">
+          <label>مجموع کل پورسانت‌ها (کاملاً مستقل از هفتگی - ریال):</label>
+          <input type="number" id="inputTotalCommission" class="form-control" placeholder="مثال: 15220689008">
+          <small style="color: #6b7280; font-size: 11px;">تغییر این فیلد تاثیری روی مبالغ دوره‌ها ندارد.</small>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #e5e7eb;">
+
+        <!-- افزودن دوره جدید -->
+        <div class="form-group">
+          <label>افزودن دوره جدید:</label>
+          <div style="display: flex; gap: 6px;">
+            <input type="text" id="newDateInput" class="form-control" placeholder="تاریخ (مثال: ۲ آبان ۱۴۰۵)">
+            <input type="number" id="newAmountInput" class="form-control" placeholder="مبلغ (ریال)">
+          </div>
+          <input type="text" id="newDetailInput" class="form-control" placeholder="توضیحات اختیاری">
+          <button class="admin-btn btn-primary" onclick="addNewPeriod()">+ افزودن این دوره</button>
+        </div>
+
+        <!-- فهرست ردیف‌ها برای حذف -->
+        <div class="form-group">
+          <label>لیست دوره‌ها (حذف یا مدیریت):</label>
+          <div class="items-table-scroll" id="adminListScroll"></div>
+        </div>
+
+        <!-- ابزارهای پشتیبان‌گیری -->
+        <div style="display: flex; gap: 8px;">
+          <button class="admin-btn btn-secondary" style="flex:1" onclick="exportDataJSON()">پشتیبان JSON</button>
+          <button class="admin-btn btn-secondary" style="flex:1" onclick="document.getElementById('importFileInput').click()">بازیابی JSON</button>
+          <input type="file" id="importFileInput" style="display:none" accept=".json" onchange="importDataJSON(event)">
+          <button class="admin-btn btn-danger" onclick="resetToInitialData()">بازنشانی پیش‌فرض</button>
+        </div>
+
+        <button class="admin-btn btn-save" onclick="saveAllChanges()">ذخیره و اعمال نهایی</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // کلید اختصاصی نسخه با هدر و استایل جدید
+    const STORAGE_KEY = 'BIMI_REWARDS_DATA_PIXEL_PERFECT_V4';
+
+    // ۲۷ ردیف دقیق ۱۴۰۵ با مبالغ متناسب زیر ۳۶ میلیون تومان
+    const INITIAL_DATA = {
+      totalCommission: 15220689008, // عدد دقیق مجموع کل مستقل در تصویر
+      items: [
+        { id: 1, date: "۲۵ مهر ۱۴۰۵", amount: 360000000, details: "پورسانت دوره هفته چهارم مهر ماه ۱۴۰۵" },
+        { id: 2, date: "۱۸ مهر ۱۴۰۵", amount: 128000000, details: "پورسانت دوره هفته سوم مهر ماه ۱۴۰۵" },
+        { id: 3, date: "۱۱ مهر ۱۴۰۵", amount: 64000000, details: "پورسانت دوره هفته دوم مهر ماه ۱۴۰۵" },
+        { id: 4, date: "۴ مهر ۱۴۰۵", amount: 360000000, details: "پورسانت دوره هفته اول مهر ماه ۱۴۰۵" },
+        { id: 5, date: "۲۸ شهریور ۱۴۰۵", amount: 96000000, details: "پورسانت دوره هفته چهارم شهریور ماه ۱۴۰۵" },
+        { id: 6, date: "۲۱ شهریور ۱۴۰۵", amount: 360000000, details: "پورسانت دوره هفته سوم شهریور ماه ۱۴۰۵" },
+        { id: 7, date: "۱۴ شهریور ۱۴۰۵", amount: 352000000, details: "پورسانت دوره هفته دوم شهریور ماه ۱۴۰۵" },
+        { id: 8, date: "۷ شهریور ۱۴۰۵", amount: 32000000, details: "پورسانت دوره هفته اول شهریور ماه ۱۴۰۵" },
+        { id: 9, date: "۳۱ مرداد ۱۴۰۵", amount: 86400000, details: "پورسانت دوره هفته پنجم مرداد ماه ۱۴۰۵" },
+        { id: 10, date: "۲۴ مرداد ۱۴۰۵", amount: 233600000, details: "پورسانت دوره هفته چهارم مرداد ماه ۱۴۰۵" },
+        { id: 11, date: "۱۷ مرداد ۱۴۰۵", amount: 160000000, details: "پورسانت دوره هفته سوم مرداد ماه ۱۴۰۵" },
+        { id: 12, date: "۱۰ مرداد ۱۴۰۵", amount: 96000000, details: "پورسانت دوره هفته دوم مرداد ماه ۱۴۰۵" },
+        { id: 13, date: "۳ مرداد ۱۴۰۵", amount: 96000000, details: "پورسانت دوره هفته اول مرداد ماه ۱۴۰۵" },
+        { id: 14, date: "۲۷ تیر ۱۴۰۵", amount: 182400000, details: "پورسانت دوره هفته چهارم تیر ماه ۱۴۰۵" },
+        { id: 15, date: "۲۰ تیر ۱۴۰۵", amount: 86400000, details: "پورسانت دوره هفته سوم تیر ماه ۱۴۰۵" },
+        { id: 16, date: "۱۳ تیر ۱۴۰۵", amount: 38400000, details: "پورسانت دوره هفته دوم تیر ماه ۱۴۰۵" },
+        { id: 17, date: "۶ تیر ۱۴۰۵", amount: 6400000, details: "پورسانت دوره هفته اول تیر ماه ۱۴۰۵" },
+        { id: 18, date: "۳۰ خرداد ۱۴۰۵", amount: 32000000, details: "پورسانت دوره هفته پنجم خرداد ماه ۱۴۰۵" },
+        { id: 19, date: "۲۳ خرداد ۱۴۰۵", amount: 32000000, details: "پورسانت دوره هفته چهارم خرداد ماه ۱۴۰۵" },
+        { id: 20, date: "۹ خرداد ۱۴۰۵", amount: 32000000, details: "پورسانت دوره هفته دوم خرداد ماه ۱۴۰۵" },
+        { id: 21, date: "۲ خرداد ۱۴۰۵", amount: 32000000, details: "پورسانت دوره هفته اول خرداد ماه ۱۴۰۵" },
+        { id: 22, date: "۱ خرداد ۱۴۰۵", amount: 27349628, details: "تسویه آغاز خرداد ماه ۱۴۰۵" },
+        { id: 23, date: "۱۹ اردیبهشت ۱۴۰۵", amount: 32000000, details: "پورسانت دوره هفته سوم اردیبهشت ماه ۱۴۰۵" },
+        { id: 24, date: "۱۲ اردیبهشت ۱۴۰۵", amount: 19200000, details: "پورسانت دوره هفته دوم اردیبهشت ماه ۱۴۰۵" },
+        { id: 25, date: "۱ اردیبهشت ۱۴۰۵", amount: 23946668, details: "تسویه آغاز اردیبهشت ماه ۱۴۰۵" },
+        { id: 26, date: "۲۲ فروردین ۱۴۰۵", amount: 32000000, details: "پورسانت دوره هفته چهارم فروردین ماه ۱۴۰۵" },
+        { id: 27, date: "۱ فروردین ۱۴۰۵", amount: 38489500, details: "تسویه آغاز سال ۱۴۰۵" }
+      ]
+    };
+
+    let appState = loadAppData();
+
+    function loadAppData() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.error("Error reading localStorage", e);
+      }
+      return JSON.parse(JSON.stringify(INITIAL_DATA));
+    }
+
+    function saveAppData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (e) {
+        console.error("Error saving data", e);
+      }
+    }
+
+    // فرمت سه‌رقمی مبالغ
+    function formatNumber(num) {
+      if (num === null || num === undefined) return "0";
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // رندر کارت اصلی در رابط کاربری
+    function renderMainUI() {
+      // نمایش مجموع کل دقیقاً بر اساس اسکرین‌شات
+      document.getElementById('totalAmountDisplay').textContent = formatNumber(appState.totalCommission);
+
+      const container = document.getElementById('rewardsListContainer');
+      container.innerHTML = '';
+
+      appState.items.forEach((item) => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'reward-item';
+        itemEl.id = `item-row-${item.id}`;
+
+        itemEl.innerHTML = `
+          <div class="reward-row-main" onclick="toggleDetails(${item.id})">
+            <!-- سمت راست: تاریخ و فلش خاکستری دقیقا مانند تصویر اصلی -->
+            <div class="right-side-date">
+              <span class="arrow-icon">
+                <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </span>
+              <span class="date-label">${item.date}</span>
+            </div>
+
+            <!-- سمت چپ: کپسول آبی مبلغ با کلمه ریال -->
+            <div class="amount-badge">
+              <span>${formatNumber(item.amount)}</span>
+              <span class="badge-curr">ریال</span>
+            </div>
+          </div>
+
+          <!-- بخش کشویی جزئیات دوره -->
+          <div class="reward-detail-panel">
+            <strong>جزئیات دوره:</strong> ${item.details || 'توضیحات تکمیلی ثبت نشده است.'}<br>
+            <strong>مبلغ دقیق:</strong> ${formatNumber(item.amount)} ریال
+          </div>
+        `;
+
+        container.appendChild(itemEl);
+      });
+    }
+
+    // باز و بسته شدن بخش جزئیات
+    function toggleDetails(id) {
+      const row = document.getElementById(`item-row-${id}`);
+      if (row) {
+        row.classList.toggle('expanded');
+      }
+    }
+
+    // پنل مدیریت
+    function toggleAdmin(show) {
+      const modal = document.getElementById('adminModal');
+      if (show) {
+        document.getElementById('inputTotalCommission').value = appState.totalCommission;
+        renderAdminList();
+        modal.classList.add('open');
+      } else {
+        modal.classList.remove('open');
+      }
+    }
+
+    function handleOverlayClick(e) {
+      if (e.target.id === 'adminModal') toggleAdmin(false);
+    }
+
+    function renderAdminList() {
+      const listEl = document.getElementById('adminListScroll');
+      listEl.innerHTML = '';
+      appState.items.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'admin-row-item';
+        div.innerHTML = `
+          <span><strong>${item.date}</strong>: ${formatNumber(item.amount)} ریال</span>
+          <button class="admin-btn btn-danger" style="padding: 3px 8px; font-size:11px;" onclick="deletePeriod(${index})">حذف</button>
+        `;
+        listEl.appendChild(div);
+      });
+    }
+
+    function addNewPeriod() {
+      const dateVal = document.getElementById('newDateInput').value.trim();
+      const amtVal = parseInt(document.getElementById('newAmountInput').value, 10);
+      const detailVal = document.getElementById('newDetailInput').value.trim();
+
+      if (!dateVal || isNaN(amtVal)) {
+        alert('لطفاً تاریخ و مبلغ دوره را وارد کنید.');
+        return;
+      }
+
+      appState.items.unshift({
+        id: Date.now(),
+        date: dateVal,
+        amount: amtVal,
+        details: detailVal || `پورسانت مربوط به ${dateVal}`
+      });
+
+      document.getElementById('newDateInput').value = '';
+      document.getElementById('newAmountInput').value = '';
+      document.getElementById('newDetailInput').value = '';
+
+      renderAdminList();
+    }
+
+    function deletePeriod(index) {
+      appState.items.splice(index, 1);
+      renderAdminList();
+    }
+
+    function saveAllChanges() {
+      const newTotal = parseInt(document.getElementById('inputTotalCommission').value, 10);
+      if (!isNaN(newTotal)) {
+        appState.totalCommission = newTotal;
+      }
+      saveAppData();
+      renderMainUI();
+      toggleAdmin(false);
+    }
+
+    function resetToInitialData() {
+      if (confirm('آیا اطلاعات به تنظیمات اولیه بازگردانده شوند؟')) {
+        appState = JSON.parse(JSON.stringify(INITIAL_DATA));
+        saveAppData();
+        renderMainUI();
+        toggleAdmin(false);
+      }
+    }
+
+    function exportDataJSON() {
+      const blob = new Blob([JSON.stringify(appState, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `bimimaster_rewards_backup.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importDataJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (parsed && parsed.items && typeof parsed.totalCommission !== 'undefined') {
+            appState = parsed;
+            saveAppData();
+            renderMainUI();
+            toggleAdmin(false);
+          }
+        } catch (err) {
+          alert('فایل پشتیبان معتبر نیست.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // شروع و نمایش اولیه
+    renderMainUI();
+  </script>
+</body>
+</html>
