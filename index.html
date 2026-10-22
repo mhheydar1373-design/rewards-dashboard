@@ -646,4 +646,170 @@
             <div class="right-side-date">
               <span class="arrow-icon">
                 <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
-  
+              </span>
+              <span class="date-label">${item.date}</span>
+            </div>
+
+            <!-- سمت چپ: کپسول آبی پاداش با فونت کاملاً ساده و غیر بولد -->
+            <div class="amount-badge">
+              <span>${formatNumber(item.amount)}</span>
+              <span class="badge-curr">ریال</span>
+            </div>
+          </div>
+
+          <div class="reward-detail-panel">
+            <strong>جزئیات دوره:</strong> ${item.details || 'توضیحات تکمیلی ثبت نشده است.'}<br>
+            <strong>مبلغ ثبت‌شده:</strong> ${formatNumber(item.amount)} ریال
+          </div>
+        `;
+
+        container.appendChild(itemEl);
+      });
+    }
+
+    function toggleDetails(id) {
+      const row = document.getElementById(`item-row-${id}`);
+      if (row) {
+        row.classList.toggle('expanded');
+      }
+    }
+
+    /* پنل مدیریت */
+    function toggleAdmin(show) {
+      const modal = document.getElementById('adminModal');
+      if (show) {
+        document.getElementById('inputTotalCommission').value = appState.totalCommission;
+        renderAdminList();
+        modal.classList.add('open');
+      } else {
+        modal.classList.remove('open');
+      }
+    }
+
+    function handleOverlayClick(e) {
+      if (e.target.id === 'adminModal') toggleAdmin(false);
+    }
+
+    /* رندر فیلدهای ویرایش مستقیم تاریخ و مبلغ هر هفته */
+    function renderAdminList() {
+      const listEl = document.getElementById('adminListScroll');
+      listEl.innerHTML = '';
+
+      appState.items.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'admin-row-editor';
+        div.innerHTML = `
+          <div class="admin-row-editor-top">
+            <input type="text" value="${item.date}" id="edit-date-${index}" title="تاریخ دوره" placeholder="تاریخ">
+            <input type="number" value="${item.amount}" id="edit-amount-${index}" title="مبلغ دوره (ریال)" placeholder="مبلغ (ریال)">
+            <button class="delete-item-btn" onclick="deletePeriod(${index})" title="حذف این دوره">حذف</button>
+          </div>
+        `;
+        listEl.appendChild(div);
+      });
+    }
+
+    function addNewPeriod() {
+      const dateVal = document.getElementById('newDateInput').value.trim();
+      const amtVal = parseInt(document.getElementById('newAmountInput').value, 10);
+
+      if (!dateVal || isNaN(amtVal)) {
+        showToast('لطفاً تاریخ و مبلغ دوره را وارد کنید.');
+        return;
+      }
+
+      appState.items.unshift({
+        id: Date.now(),
+        date: dateVal,
+        amount: amtVal,
+        details: `پورسانت مربوط به ${dateVal}`
+      });
+
+      document.getElementById('newDateInput').value = '';
+      document.getElementById('newAmountInput').value = '';
+
+      renderAdminList();
+      showToast('دوره جدید اضافه شد');
+    }
+
+    function deletePeriod(index) {
+      appState.items.splice(index, 1);
+      renderAdminList();
+    }
+
+    /* ذخیره تمامی تغییرات مبالغ دوره‌ها و مجموع کل */
+    function saveAllChanges() {
+      // ۱. ذخیره مجموع کل مستقل
+      const newTotal = parseInt(document.getElementById('inputTotalCommission').value, 10);
+      if (!isNaN(newTotal)) {
+        appState.totalCommission = newTotal;
+      }
+
+      // ۲. خواندن و اعمال مبالغ و تاریخ‌های ویرایش‌شده برای هر هفته
+      appState.items.forEach((item, index) => {
+        const dateInput = document.getElementById(`edit-date-${index}`);
+        const amountInput = document.getElementById(`edit-amount-${index}`);
+
+        if (dateInput && dateInput.value.trim() !== '') {
+          item.date = dateInput.value.trim();
+        }
+
+        if (amountInput) {
+          const val = parseInt(amountInput.value, 10);
+          if (!isNaN(val)) {
+            item.amount = val;
+          }
+        }
+      });
+
+      saveAppData();
+      renderMainUI();
+      toggleAdmin(false);
+      showToast('تغییرات با موفقیت ذخیره شد');
+    }
+
+    function resetToInitialData() {
+      appState = JSON.parse(JSON.stringify(INITIAL_DATA));
+      saveAppData();
+      renderMainUI();
+      renderAdminList();
+      document.getElementById('inputTotalCommission').value = appState.totalCommission;
+      showToast('اطلاعات به حالت پیش‌فرض بازگردانده شد');
+    }
+
+    function exportDataJSON() {
+      const blob = new Blob([JSON.stringify(appState, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `rewards_backup.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importDataJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (parsed && parsed.items && typeof parsed.totalCommission !== 'undefined') {
+            appState = parsed;
+            saveAppData();
+            renderMainUI();
+            toggleAdmin(false);
+            showToast('پشتیبان با موفقیت بازیابی شد');
+          }
+        } catch (err) {
+          showToast('فایل JSON معتبر نیست');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    renderMainUI();
+  </script>
+</body>
+</html>
+```
