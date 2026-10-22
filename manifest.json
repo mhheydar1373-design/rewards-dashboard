@@ -1,0 +1,22 @@
+{
+  "name": "بیمه مستر",
+  "short_name": "بیمه مستر",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#032b49",
+  "theme_color": "#032b49",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
